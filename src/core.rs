@@ -14,10 +14,8 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Game {
-        let mut tetromino = Tetromino::new();
-        tetromino.pick_random_rotation();
         Game {
-            tetromino,
+            tetromino: Tetromino::new(),
             counter: 0,
         }
     }
@@ -33,15 +31,21 @@ impl Game {
 
 pub struct Tetromino {
     pub shape: Shape,
-    pub current_rotation: Option<u16>,
+    pub current_rotation: u16,
     pub topleft: Coord,
 }
 
 impl Tetromino {
     pub fn new() -> Tetromino {
+        let shape = rand::random::<Shape>();
+        let current_rotation = shape
+            .get_possible_rotations()
+            .choose(&mut rand::thread_rng())
+            .copied()
+            .unwrap();
         Tetromino {
-            shape: rand::random::<Shape>(),
-            current_rotation: None,
+            shape,
+            current_rotation,
             topleft: Coord {
                 y: 0,
                 x: PLAYGROUND_WIDTH / 2 - 1,
@@ -49,33 +53,49 @@ impl Tetromino {
         }
     }
 
-    pub fn move_sideways(&mut self, direction: Direction) {
+    pub fn move_sideways(&mut self, direction: Direction) -> Result<(), &'static str> {
+        let tetrovec = self.shape.to_vec(self.current_rotation);
+        for (rowidx, row) in tetrovec.iter().enumerate() {
+            for (colidx, _) in row.iter().enumerate() {
+                if tetrovec[rowidx][colidx] != 0 {
+                    let Coord { y, x } = self.topleft;
+                    if !(0..PLAYGROUND_WIDTH).contains(&(colidx as i32 + x + direction as i32)) {
+                        return Err("Out of bounds.");
+                    }
+                }
+            }
+        }
         self.topleft.x += direction as i32;
+        Ok(())
     }
 
-    pub fn move_down(&mut self) {
+    pub fn move_down(&mut self) -> Result<(), &'static str> {
+        let tetrovec = self.shape.to_vec(self.current_rotation);
+        for (rowidx, row) in tetrovec.iter().enumerate() {
+            for (colidx, _) in row.iter().enumerate() {
+                if tetrovec[rowidx][colidx] != 0 {
+                    let Coord { y, x } = self.topleft;
+                    if rowidx + y as usize + 1 >= PLAYGROUND_HEIGHT as usize {
+                        return Err("Out of bounds.");
+                    }
+                }
+            }
+        }
         self.topleft.y += 1;
-    }
-
-    pub fn pick_random_rotation(&mut self) {
-        self.current_rotation = self
-            .shape
-            .get_possible_rotations()
-            .choose(&mut rand::thread_rng())
-            .copied();
+        Ok(())
     }
 
     pub fn rotate(&mut self, direction: Direction) {
         let rotations = self.shape.get_possible_rotations();
         let current_index = rotations
             .iter()
-            .position(|x| *x == self.current_rotation.unwrap())
+            .position(|x| *x == self.current_rotation)
             .unwrap();
         let next_index = i32::checked_rem_euclid(
             current_index as i32 + direction as i32,
             rotations.len() as i32,
         );
-        self.current_rotation = Some(rotations[next_index.unwrap() as usize]);
+        self.current_rotation = rotations[next_index.unwrap() as usize];
     }
 }
 
@@ -128,6 +148,7 @@ impl Distribution<Shape> for Standard {
 
 type ShapeVec = Vec<Vec<u16>>;
 
+#[derive(Clone, Copy)]
 pub enum Direction {
     Left = -1,
     Right = 1,
