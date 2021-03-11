@@ -62,7 +62,7 @@ impl Tetromino {
             .copied();
     }
 
-    fn rotate(&mut self, direction: Direction) {
+    pub fn rotate(&mut self, direction: Direction) {
         let rotations = self.shape.get_possible_rotations();
         let current_index = rotations
             .iter()
@@ -125,7 +125,7 @@ impl Distribution<Shape> for Standard {
 
 type ShapeVec = Vec<Vec<u16>>;
 
-enum Direction {
+pub enum Direction {
     Left = -1,
     Right = 1,
 }
