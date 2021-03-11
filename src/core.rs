@@ -4,6 +4,9 @@ use rand::{
     Rng,
 };
 
+pub const PLAYGROUND_WIDTH: i32 = 10;
+pub const PLAYGROUND_HEIGHT: i32 = 16;
+
 pub struct Game {
     pub tetromino: Tetromino,
     counter: u8,
