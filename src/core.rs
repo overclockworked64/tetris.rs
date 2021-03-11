@@ -18,7 +18,7 @@ impl Game {
     pub fn new() -> Game {
         let grid = Game::create_grid();
         Game {
-            tetromino: Tetromino::new(&grid),
+            tetromino: Tetromino::new(grid.clone()),
             grid,
             counter: 0,
         }
@@ -43,7 +43,7 @@ impl Game {
                 if let Err(_) = self.land_tetromino() {
                     std::process::exit(0);
                 } else {
-                    self.tetromino = Tetromino::new(&self.grid);
+                    self.tetromino = Tetromino::new(self.grid.clone());
                 }
             }
             self.counter = 0;
@@ -94,7 +94,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn new(grid: &Grid) -> Tetromino {
+    pub fn new(grid: Grid) -> Tetromino {
         let shape = rand::random::<Shape>();
         let current_rotation = shape
             .get_possible_rotations()
@@ -103,14 +103,11 @@ impl Tetromino {
             .unwrap();
         let color = shape.get_color();
         Tetromino {
-            grid: grid.to_vec(),
+            grid,
             shape,
             color,
             current_rotation,
-            topleft: Coord {
-                y: 0,
-                x: PLAYGROUND_WIDTH / 2 - 1,
-            },
+            topleft: Coord::new(0, PLAYGROUND_WIDTH / 2 - 1),
         }
     }
 
@@ -240,4 +237,10 @@ pub enum Direction {
 pub struct Coord {
     pub y: i32,
     pub x: i32,
+}
+
+impl Coord {
+    fn new(y: i32, x: i32) -> Coord {
+        Coord { y, x }
+    }
 }
