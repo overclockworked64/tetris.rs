@@ -54,12 +54,14 @@ pub fn refresh_screens(inner_screen: nc::WINDOW) {
     nc::wrefresh(inner_screen);
 }
 
+pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
     let tetrovec = tetromino.shape.to_vec(tetromino.current_rotation.unwrap());
     for (rowidx, row) in tetrovec.iter().enumerate() {
         for (colidx, col) in row.iter().enumerate() {
             if tetrovec[rowidx][colidx] != 0 {
                 let Coord { y, x } = tetromino.topleft;
-                nc::mvaddstr(
+                nc::mvwaddstr(
+                    screen,
                     rowidx as i32 + y as i32,
                     (colidx as i32 + x as i32) * 2,
                     "██",
