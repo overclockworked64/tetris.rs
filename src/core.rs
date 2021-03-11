@@ -30,6 +30,7 @@ impl Game {
         }
     }
 }
+
 pub struct Tetromino {
     pub shape: Shape,
     pub current_rotation: Option<u16>,
@@ -41,7 +42,7 @@ impl Tetromino {
         Tetromino {
             shape: rand::random::<Shape>(),
             current_rotation: None,
-            topleft: Coord { y: 0, x: 0 },
+            topleft: Coord { y: 0, x: PLAYGROUND_WIDTH / 2 - 1 },
         }
     }
 
