@@ -42,7 +42,10 @@ impl Tetromino {
         Tetromino {
             shape: rand::random::<Shape>(),
             current_rotation: None,
-            topleft: Coord { y: 0, x: PLAYGROUND_WIDTH / 2 - 1 },
+            topleft: Coord {
+                y: 0,
+                x: PLAYGROUND_WIDTH / 2 - 1,
+            },
         }
     }
 

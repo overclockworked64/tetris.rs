@@ -1,9 +1,4 @@
-use crate::core::{
-    Coord,
-    Tetromino,
-    PLAYGROUND_WIDTH,
-    PLAYGROUND_HEIGHT,
-};
+use crate::core::{Coord, Tetromino, PLAYGROUND_HEIGHT, PLAYGROUND_WIDTH};
 use ncurses as nc;
 
 const SCREEN_WIDTH: i32 = PLAYGROUND_WIDTH * 2;
