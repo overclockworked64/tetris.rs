@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 ncurses = { version = "5.101.0", features = ["wide"] }
 rand = "0.8.3"
+strum = "0.20.0"
+strum_macros = "0.20.1"
