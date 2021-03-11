@@ -8,13 +8,6 @@ use rand::{
 pub const PLAYGROUND_WIDTH: i32 = 10;
 pub const PLAYGROUND_HEIGHT: i32 = 16;
 
-pub type Grid = Vec<Vec<Block>>;
-
-pub struct Block {
-    pub value: u8,
-    pub color: Option<Color>,
-}
-
 pub struct Game {
     pub grid: Grid,
     pub tetromino: Tetromino,
@@ -23,32 +16,34 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Game {
+        let grid = Game::create_grid();
+        Game {
+            tetromino: Tetromino::new(&grid),
+            grid,
+            counter: 0,
+        }
+    }
+
+    fn create_grid() -> Grid {
         let mut grid = vec![];
         for _ in 0..PLAYGROUND_HEIGHT {
             let mut row = vec![];
             for _ in 0..PLAYGROUND_WIDTH {
-                row.push(Block {
-                    value: 0,
-                    color: None,
-                });
+                row.push(Block::new(0, None));
             }
             grid.push(row);
         }
-        Game {
-            grid,
-            tetromino: Tetromino::new(),
-            counter: 0,
-        }
+        grid
     }
 
     pub fn handle_falling(&mut self) {
         self.counter += 1;
         if self.counter == 5 {
-            if let Err(_) = self.tetromino.move_down(&self.grid) {
+            if let Err(_) = self.tetromino.move_down() {
                 if let Err(_) = self.land_tetromino() {
                     std::process::exit(0);
                 } else {
-                    self.tetromino = Tetromino::new();
+                    self.tetromino = Tetromino::new(&self.grid);
                 }
             }
             self.counter = 0;
@@ -76,7 +71,22 @@ impl Game {
     }
 }
 
+pub type Grid = Vec<Vec<Block>>;
+
+#[derive(Clone, Copy)]
+pub struct Block {
+    pub value: u8,
+    pub color: Option<Color>,
+}
+
+impl Block {
+    fn new(value: u8, color: Option<Color>) -> Block {
+        Block { value, color }
+    }
+}
+
 pub struct Tetromino {
+    grid: Grid,
     pub shape: Shape,
     pub color: Color,
     pub topleft: Coord,
@@ -84,7 +94,7 @@ pub struct Tetromino {
 }
 
 impl Tetromino {
-    pub fn new() -> Tetromino {
+    pub fn new(grid: &Grid) -> Tetromino {
         let shape = rand::random::<Shape>();
         let current_rotation = shape
             .get_possible_rotations()
@@ -93,6 +103,7 @@ impl Tetromino {
             .unwrap();
         let color = shape.get_color();
         Tetromino {
+            grid: grid.to_vec(),
             shape,
             color,
             current_rotation,
@@ -103,20 +114,17 @@ impl Tetromino {
         }
     }
 
-    pub fn move_sideways(&mut self, grid: &Grid, direction: Direction) -> Result<(), &'static str> {
+    pub fn move_sideways(&mut self, direction: Direction) -> Result<(), &'static str> {
         let tetrovec = self.shape.to_vec(self.current_rotation);
         for (rowidx, row) in tetrovec.iter().enumerate() {
             for (colidx, _) in row.iter().enumerate() {
                 if tetrovec[rowidx][colidx] != 0 {
                     let Coord { y, x } = self.topleft;
-                    if !(0..PLAYGROUND_WIDTH).contains(&(colidx as i32 + x + direction as i32)) {
+                    let next_step = colidx as i32 + x + direction as i32;
+                    if !(0..PLAYGROUND_WIDTH).contains(&next_step) {
                         return Err("Out of bounds.");
                     }
-                    if grid[rowidx + y as usize]
-                        [(colidx as i32 + x as i32 + direction as i32) as usize]
-                        .value
-                        != 0
-                    {
+                    if self.grid[rowidx + y as usize][next_step as usize].value != 0 {
                         return Err("Collision.");
                     }
                 }
@@ -126,18 +134,20 @@ impl Tetromino {
         Ok(())
     }
 
-    pub fn move_down(&mut self, grid: &Grid) -> Result<(), &'static str> {
+    pub fn move_down(&mut self) -> Result<(), &'static str> {
         let tetrovec = self.shape.to_vec(self.current_rotation);
         for (rowidx, row) in tetrovec.iter().enumerate() {
             for (colidx, _) in row.iter().enumerate() {
                 if tetrovec[rowidx][colidx] != 0 {
                     let Coord { y, x } = self.topleft;
-                    if rowidx + y as usize + 1 >= PLAYGROUND_HEIGHT as usize {
+                    let next_step = Coord {
+                        y: rowidx as i32 + y + 1,
+                        x: colidx as i32 + x,
+                    };
+                    if next_step.y as usize >= PLAYGROUND_HEIGHT as usize {
                         return Err("Out of bounds.");
                     }
-                    if grid[(rowidx as i32 + y + 1) as usize][(colidx as i32 + x) as usize].value
-                        != 0
-                    {
+                    if self.grid[next_step.y as usize][next_step.x as usize].value != 0 {
                         return Err("Collision.");
                     }
                 }
