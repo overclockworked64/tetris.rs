@@ -1,0 +1,11 @@
+[package]
+name = "tetris-rs"
+version = "0.1.0"
+authors = ["xvm32 <xvm32@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ncurses = { version = "5.101.0", features = ["wide"] }
+rand = "0.8.3"
