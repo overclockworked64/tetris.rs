@@ -46,6 +46,10 @@ impl Tetromino {
         }
     }
 
+    pub fn move_sideways(&mut self, direction: Direction) {
+        self.topleft.x += direction as i32;
+    }
+
     pub fn move_down(&mut self) {
         self.topleft.y += 1;
     }
