@@ -28,13 +28,19 @@ fn main() {
         let user_input = nc::wgetch(inner_screen);
         match user_input {
             nc::KEY_LEFT => {
-                game.tetromino.move_sideways(core::Direction::Left);
+                if let Err(_) = game.tetromino.move_sideways(core::Direction::Left) {
+                    continue;
+                }
             }
             nc::KEY_RIGHT => {
-                game.tetromino.move_sideways(core::Direction::Right);
+                if let Err(_) = game.tetromino.move_sideways(core::Direction::Right) {
+                    continue;
+                }
             }
             nc::KEY_DOWN => {
-                game.tetromino.move_down();
+                if let Err(_) = game.tetromino.move_down() {
+                    continue;
+                }
             }
             KEY_A => {
                 game.tetromino.rotate(core::Direction::Left);

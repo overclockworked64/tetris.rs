@@ -50,7 +50,7 @@ pub fn refresh_screens(inner_screen: nc::WINDOW) {
 }
 
 pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
-    let tetrovec = tetromino.shape.to_vec(tetromino.current_rotation.unwrap());
+    let tetrovec = tetromino.shape.to_vec(tetromino.current_rotation);
     for (rowidx, row) in tetrovec.iter().enumerate() {
         for (colidx, col) in row.iter().enumerate() {
             if tetrovec[rowidx][colidx] != 0 {
