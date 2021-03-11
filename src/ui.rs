@@ -1,5 +1,7 @@
 use crate::core::{Coord, Grid, Tetromino, PLAYGROUND_HEIGHT, PLAYGROUND_WIDTH};
 use ncurses as nc;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 const SCREEN_WIDTH: i32 = PLAYGROUND_WIDTH * 2;
 const SCREEN_HEIGHT: i32 = PLAYGROUND_HEIGHT;
@@ -11,6 +13,7 @@ pub fn curses_init() {
     nc::curs_set(nc::CURSOR_VISIBILITY::CURSOR_INVISIBLE);
     nc::noecho();
     nc::keypad(nc::stdscr(), true);
+    init_color_pairs();
 }
 
 pub fn curses_teardown() {
@@ -18,6 +21,14 @@ pub fn curses_teardown() {
     nc::refresh();
     nc::doupdate();
     nc::endwin();
+}
+
+pub fn init_color_pairs() {
+    nc::start_color();
+    nc::init_color(nc::COLOR_YELLOW, 1000, 1000, 0);
+    Color::iter().for_each(|color| {
+        nc::init_pair(color as i16, color as i16, color as i16);
+    });
 }
 
 pub fn create_screens() -> (nc::WINDOW, nc::WINDOW) {
@@ -55,12 +66,14 @@ pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
         for (colidx, _) in row.iter().enumerate() {
             if tetrovec[rowidx][colidx] != 0 {
                 let Coord { y, x } = tetromino.topleft;
+                nc::wattr_on(screen, nc::COLOR_PAIR(tetromino.color as i16));
                 nc::mvwaddstr(
                     screen,
                     rowidx as i32 + y as i32,
                     (colidx as i32 + x as i32) * 2,
                     "██",
                 );
+                nc::wattroff(screen, nc::COLOR_PAIR(tetromino.color as i16));
             }
         }
     }
@@ -69,9 +82,23 @@ pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
 pub fn draw_landed_tetrominos(screen: nc::WINDOW, grid: &Grid) {
     for (rowidx, row) in grid.iter().enumerate() {
         for (colidx, _) in row.iter().enumerate() {
-            if grid[rowidx][colidx] != 0 {
+            let block = &grid[rowidx][colidx];
+            if block.value != 0 {
+                nc::wattr_on(screen, nc::COLOR_PAIR(block.color.unwrap() as i16));
                 nc::mvwaddstr(screen, rowidx as i32, colidx as i32 * 2, "██");
+                nc::wattroff(screen, nc::COLOR_PAIR(block.color.unwrap() as i16));
             }
         }
     }
+}
+
+#[derive(Clone, Copy, EnumIter)]
+pub enum Color {
+    Yellow = nc::COLOR_YELLOW as isize,
+    Blue = nc::COLOR_BLUE as isize,
+    Green = nc::COLOR_GREEN as isize,
+    Red = nc::COLOR_RED as isize,
+    Magenta = nc::COLOR_MAGENTA as isize,
+    Cyan = nc::COLOR_CYAN as isize,
+    White = nc::COLOR_WHITE as isize,
 }

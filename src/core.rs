@@ -1,3 +1,4 @@
+use crate::ui::Color;
 use rand::{
     distributions::{Distribution, Standard},
     prelude::SliceRandom,
@@ -7,7 +8,12 @@ use rand::{
 pub const PLAYGROUND_WIDTH: i32 = 10;
 pub const PLAYGROUND_HEIGHT: i32 = 16;
 
-pub type Grid = Vec<Vec<u16>>;
+pub type Grid = Vec<Vec<Block>>;
+
+pub struct Block {
+    pub value: u8,
+    pub color: Option<Color>,
+}
 
 pub struct Game {
     pub grid: Grid,
@@ -21,7 +27,10 @@ impl Game {
         for _ in 0..PLAYGROUND_HEIGHT {
             let mut row = vec![];
             for _ in 0..PLAYGROUND_WIDTH {
-                row.push(0);
+                row.push(Block {
+                    value: 0,
+                    color: None,
+                });
             }
             grid.push(row);
         }
@@ -56,8 +65,10 @@ impl Game {
             for (colidx, _) in row.iter().enumerate() {
                 if tetrovec[rowidx][colidx] != 0 {
                     let Coord { y, x } = self.tetromino.topleft;
-                    self.grid[rowidx + y as usize][(colidx as i32 + x as i32) as usize] =
-                        tetrovec[rowidx][colidx]
+                    self.grid[rowidx + y as usize][(colidx as i32 + x as i32) as usize] = Block {
+                        value: tetrovec[rowidx][colidx] as u8,
+                        color: Some(self.tetromino.color),
+                    }
                 }
             }
         }
@@ -67,8 +78,9 @@ impl Game {
 
 pub struct Tetromino {
     pub shape: Shape,
-    pub current_rotation: u16,
+    pub color: Color,
     pub topleft: Coord,
+    pub current_rotation: u16,
 }
 
 impl Tetromino {
@@ -79,8 +91,10 @@ impl Tetromino {
             .choose(&mut rand::thread_rng())
             .copied()
             .unwrap();
+        let color = shape.get_color();
         Tetromino {
             shape,
+            color,
             current_rotation,
             topleft: Coord {
                 y: 0,
@@ -100,6 +114,7 @@ impl Tetromino {
                     }
                     if grid[rowidx + y as usize]
                         [(colidx as i32 + x as i32 + direction as i32) as usize]
+                        .value
                         != 0
                     {
                         return Err("Collision.");
@@ -120,7 +135,9 @@ impl Tetromino {
                     if rowidx + y as usize + 1 >= PLAYGROUND_HEIGHT as usize {
                         return Err("Out of bounds.");
                     }
-                    if grid[(rowidx as i32 + y + 1) as usize][(colidx as i32 + x) as usize] != 0 {
+                    if grid[(rowidx as i32 + y + 1) as usize][(colidx as i32 + x) as usize].value
+                        != 0
+                    {
                         return Err("Collision.");
                     }
                 }
@@ -155,6 +172,18 @@ pub enum Shape {
 }
 
 impl Shape {
+    fn get_color(&self) -> Color {
+        match self {
+            Shape::O => Color::Blue,
+            Shape::I => Color::Yellow,
+            Shape::S => Color::Cyan,
+            Shape::Z => Color::White,
+            Shape::J => Color::Magenta,
+            Shape::L => Color::Red,
+            Shape::T => Color::Green,
+        }
+    }
+
     fn get_possible_rotations(&self) -> Vec<u16> {
         match self {
             Shape::O => vec![51],
