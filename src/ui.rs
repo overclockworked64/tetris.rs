@@ -1,4 +1,4 @@
-use crate::core::{Coord, Tetromino, PLAYGROUND_HEIGHT, PLAYGROUND_WIDTH};
+use crate::core::{Coord, Grid, Tetromino, PLAYGROUND_HEIGHT, PLAYGROUND_WIDTH};
 use ncurses as nc;
 
 const SCREEN_WIDTH: i32 = PLAYGROUND_WIDTH * 2;
@@ -52,7 +52,7 @@ pub fn refresh_screens(inner_screen: nc::WINDOW) {
 pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
     let tetrovec = tetromino.shape.to_vec(tetromino.current_rotation);
     for (rowidx, row) in tetrovec.iter().enumerate() {
-        for (colidx, col) in row.iter().enumerate() {
+        for (colidx, _) in row.iter().enumerate() {
             if tetrovec[rowidx][colidx] != 0 {
                 let Coord { y, x } = tetromino.topleft;
                 nc::mvwaddstr(
@@ -61,6 +61,16 @@ pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
                     (colidx as i32 + x as i32) * 2,
                     "██",
                 );
+            }
+        }
+    }
+}
+
+pub fn draw_landed_tetrominos(screen: nc::WINDOW, grid: &Grid) {
+    for (rowidx, row) in grid.iter().enumerate() {
+        for (colidx, _) in row.iter().enumerate() {
+            if grid[rowidx][colidx] != 0 {
+                nc::mvwaddstr(screen, rowidx as i32, colidx as i32 * 2, "██");
             }
         }
     }

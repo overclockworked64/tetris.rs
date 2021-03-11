@@ -20,6 +20,7 @@ fn main() {
     loop {
         ui::erase_screens(inner_screen, border_screen);
         nc::box_(border_screen, 0, 0);
+        ui::draw_landed_tetrominos(inner_screen, &game.grid);
         ui::draw_tetromino(inner_screen, &game.tetromino);
         ui::refresh_screens(inner_screen);
 
@@ -28,17 +29,23 @@ fn main() {
         let user_input = nc::wgetch(inner_screen);
         match user_input {
             nc::KEY_LEFT => {
-                if let Err(_) = game.tetromino.move_sideways(core::Direction::Left) {
+                if let Err(_) = game
+                    .tetromino
+                    .move_sideways(&game.grid, core::Direction::Left)
+                {
                     continue;
                 }
             }
             nc::KEY_RIGHT => {
-                if let Err(_) = game.tetromino.move_sideways(core::Direction::Right) {
+                if let Err(_) = game
+                    .tetromino
+                    .move_sideways(&game.grid, core::Direction::Right)
+                {
                     continue;
                 }
             }
             nc::KEY_DOWN => {
-                if let Err(_) = game.tetromino.move_down() {
+                if let Err(_) = game.tetromino.move_down(&game.grid) {
                     continue;
                 }
             }
