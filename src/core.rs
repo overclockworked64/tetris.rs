@@ -4,6 +4,29 @@ use rand::{
     Rng,
 };
 
+pub struct Game {
+    pub tetromino: Tetromino,
+    counter: u8,
+}
+
+impl Game {
+    pub fn new() -> Game {
+        let mut tetromino = Tetromino::new();
+        tetromino.pick_random_rotation();
+        Game {
+            tetromino,
+            counter: 0,
+        }
+    }
+
+    pub fn handle_falling(&mut self) {
+        self.counter += 1;
+        if self.counter == 5 {
+            self.tetromino.move_down();
+            self.counter = 0;
+        }
+    }
+}
 pub struct Tetromino {
     pub shape: Shape,
     pub current_rotation: Option<u16>,
