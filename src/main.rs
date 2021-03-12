@@ -33,25 +33,35 @@ fn main() {
         let user_input = nc::wgetch(inner_screen);
         match user_input {
             nc::KEY_LEFT => {
-                if let Err(_) = game.tetromino.move_sideways(core::Direction::Left) {
-                    continue;
+                if !game.paused {
+                    if let Err(_) = game.tetromino.move_sideways(core::Direction::Left) {
+                        continue;
+                    }    
                 }
             }
             nc::KEY_RIGHT => {
-                if let Err(_) = game.tetromino.move_sideways(core::Direction::Right) {
-                    continue;
+                if !game.paused {
+                    if let Err(_) = game.tetromino.move_sideways(core::Direction::Right) {
+                        continue;
+                    }    
                 }
             }
             nc::KEY_DOWN => {
-                if let Err(_) = game.tetromino.move_down() {
-                    continue;
+                if !game.paused {
+                    if let Err(_) = game.tetromino.move_down() {
+                        continue;
+                    }    
                 }
             }
             KEY_A => {
-                game.tetromino.rotate(core::Direction::Left);
+                if !game.paused {
+                    game.tetromino.rotate(core::Direction::Left);
+                }
             }
             KEY_D => {
-                game.tetromino.rotate(core::Direction::Right);
+                if !game.paused {
+                    game.tetromino.rotate(core::Direction::Right);
+                }
             }
             KEY_P => {
                 game.paused = !game.paused;
