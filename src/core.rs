@@ -1,4 +1,4 @@
-use crate::ui::Color;
+use crate::ui::{Color, curses_teardown};
 use rand::{
     distributions::{Distribution, Standard},
     prelude::SliceRandom,
@@ -29,24 +29,26 @@ impl Game {
     fn create_grid() -> Grid {
         let mut grid = vec![];
         for _ in 0..PLAYGROUND_HEIGHT {
-            let mut row = vec![];
-            for _ in 0..PLAYGROUND_WIDTH {
-                row.push(Block::new(0, None));
-            }
+            let row = Game::create_empty_row();
             grid.push(row);
         }
         grid
     }
 
+    fn create_empty_row() -> Vec<Block> {
+        let mut row = vec![];
+        for _ in 0..PLAYGROUND_WIDTH {
+            row.push(Block::new(0, None));
+        }
+        row
+    }
+
     pub fn clear_rows(&mut self) {
         for i in 0..self.grid.len() {
             if self.grid[i].iter().fold(0, |acc, block| acc + block.value) as i32 == PLAYGROUND_WIDTH {
-                let mut r = vec![];
-                for _ in 0..PLAYGROUND_WIDTH {
-                    r.push(Block::new(0, None));
-                }
+                let row = Game::create_empty_row();
                 self.grid.remove(i);
-                self.grid.insert(0, r);
+                self.grid.insert(0, row);
             }
         }
     }
@@ -56,6 +58,7 @@ impl Game {
         if self.counter == 5 {
             if let Err(_) = self.tetromino.move_down() {
                 if let Err(_) = self.land_tetromino() {
+                    curses_teardown();
                     std::process::exit(0);
                 } else {
                     self.tetromino = Tetromino::new(self.grid.clone());
@@ -69,8 +72,10 @@ impl Game {
         if self.tetromino.topleft.y <= 0 {
             return Err("Game over.");
         }
+
         let current_rotation = self.tetromino.current_rotation;
         let tetrovec = self.tetromino.shape.to_vec(current_rotation);
+
         for (rowidx, row) in tetrovec.iter().enumerate() {
             for (colidx, _) in row.iter().enumerate() {
                 if tetrovec[rowidx][colidx] != 0 {
@@ -122,7 +127,10 @@ impl Tetromino {
             shape,
             color,
             current_rotation,
-            topleft: Coord::new(0, PLAYGROUND_WIDTH / 2 - 1),
+            topleft: Coord {
+                y: 0,
+                x: PLAYGROUND_WIDTH / 2 - 1,
+            },
         }
     }
 
@@ -143,7 +151,14 @@ impl Tetromino {
             }
         }
         self.topleft.x += direction as i32;
+
         Ok(())
+    }
+
+    pub fn move_all_the_way_down(&mut self) {
+        while let Ok(()) = self.move_down() {
+            continue;
+        }
     }
 
     pub fn move_down(&mut self) -> Result<(), &'static str> {
@@ -166,6 +181,7 @@ impl Tetromino {
             }
         }
         self.topleft.y += 1;
+
         Ok(())
     }
 
@@ -252,10 +268,4 @@ pub enum Direction {
 pub struct Coord {
     pub y: i32,
     pub x: i32,
-}
-
-impl Coord {
-    fn new(y: i32, x: i32) -> Coord {
-        Coord { y, x }
-    }
 }

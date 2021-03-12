@@ -5,6 +5,7 @@ mod ui;
 
 const KEY_A: i32 = b'a' as i32;
 const KEY_D: i32 = b'd' as i32;
+const KEY_S: i32 = b's' as i32;
 const KEY_P: i32 = b'p' as i32;
 const ESC: i32 = 27;
 
@@ -61,6 +62,11 @@ fn main() {
             KEY_D => {
                 if !game.paused {
                     game.tetromino.rotate(core::Direction::Right);
+                }
+            }
+            KEY_S => {
+                if !game.paused {
+                    game.tetromino.move_all_the_way_down();
                 }
             }
             KEY_P => {
