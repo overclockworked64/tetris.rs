@@ -12,6 +12,7 @@ pub struct Game {
     pub grid: Grid,
     pub tetromino: Tetromino,
     pub paused: bool,
+    pub score: u64,
     counter: u8,
 }
 
@@ -21,6 +22,7 @@ impl Game {
         Game {
             tetromino: Tetromino::new(grid.clone()),
             grid,
+            score: 0,
             counter: 0,
             paused: false,
         }
@@ -49,6 +51,7 @@ impl Game {
                 let row = Game::create_empty_row();
                 self.grid.remove(i);
                 self.grid.insert(0, row);
+                self.score += PLAYGROUND_WIDTH as u64;
             }
         }
     }
@@ -67,6 +70,7 @@ impl Game {
             self.counter = 0;
         }
     }
+
 
     fn land_tetromino(&mut self) -> Result<(), &'static str> {
         if self.tetromino.topleft.y <= 0 {

@@ -24,6 +24,7 @@ fn main() {
         nc::box_(border_screen, 0, 0);
         ui::draw_landed_tetrominos(inner_screen, &game.grid);
         ui::draw_tetromino(inner_screen, &game.tetromino);
+        ui::draw_score(game.score);
         ui::refresh_screens(inner_screen);
 
         if !game.paused {

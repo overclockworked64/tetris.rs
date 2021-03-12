@@ -92,6 +92,12 @@ pub fn draw_landed_tetrominos(screen: nc::WINDOW, grid: &Grid) {
     }
 }
 
+pub fn draw_score(score: u64) {
+    let y = (nc::LINES() - SCREEN_HEIGHT) / 2 + SCREEN_HEIGHT + 1;
+    let x = (nc::COLS() - SCREEN_WIDTH) / 2 - 1;
+    nc::mvwaddstr(nc::stdscr(), y, x, &format!("SCORE: {}", score));
+}
+
 #[derive(Clone, Copy, EnumIter)]
 pub enum Color {
     Yellow = nc::COLOR_YELLOW as isize,
