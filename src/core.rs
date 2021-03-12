@@ -51,6 +51,7 @@ impl Game {
                 let row = Game::create_empty_row();
                 self.grid.remove(i);
                 self.grid.insert(0, row);
+                self.tetromino.grid = self.grid.clone();
                 self.score += PLAYGROUND_WIDTH as u64;
             }
         }
@@ -97,7 +98,7 @@ impl Game {
 
 pub type Grid = Vec<Vec<Block>>;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Block {
     pub value: u8,
     pub color: Option<Color>,

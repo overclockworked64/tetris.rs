@@ -98,7 +98,7 @@ pub fn draw_score(score: u64) {
     nc::mvwaddstr(nc::stdscr(), y, x, &format!("SCORE: {}", score));
 }
 
-#[derive(Clone, Copy, EnumIter)]
+#[derive(Clone, Copy, Debug, EnumIter)]
 pub enum Color {
     Yellow = nc::COLOR_YELLOW as isize,
     Blue = nc::COLOR_BLUE as isize,
