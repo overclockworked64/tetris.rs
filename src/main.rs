@@ -5,6 +5,7 @@ mod ui;
 
 const KEY_A: i32 = b'a' as i32;
 const KEY_D: i32 = b'd' as i32;
+const KEY_P: i32 = b'p' as i32;
 const ESC: i32 = 27;
 
 fn main() {
@@ -24,7 +25,10 @@ fn main() {
         ui::draw_tetromino(inner_screen, &game.tetromino);
         ui::refresh_screens(inner_screen);
 
-        game.handle_falling();
+        if !game.paused {
+            game.handle_falling();
+            game.clear_rows();    
+        }
 
         let user_input = nc::wgetch(inner_screen);
         match user_input {
@@ -48,6 +52,9 @@ fn main() {
             }
             KEY_D => {
                 game.tetromino.rotate(core::Direction::Right);
+            }
+            KEY_P => {
+                game.paused = !game.paused;
             }
             ESC => break,
             _ => {}
