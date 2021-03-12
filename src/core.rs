@@ -11,6 +11,7 @@ pub const PLAYGROUND_HEIGHT: i32 = 16;
 pub struct Game {
     pub grid: Grid,
     pub tetromino: Tetromino,
+    pub paused: bool,
     counter: u8,
 }
 
@@ -21,6 +22,7 @@ impl Game {
             tetromino: Tetromino::new(grid.clone()),
             grid,
             counter: 0,
+            paused: false,
         }
     }
 
@@ -34,6 +36,19 @@ impl Game {
             grid.push(row);
         }
         grid
+    }
+
+    pub fn clear_rows(&mut self) {
+        for i in 0..self.grid.len() {
+            if self.grid[i].iter().fold(0, |acc, block| acc + block.value) as i32 == PLAYGROUND_WIDTH {
+                let mut r = vec![];
+                for _ in 0..PLAYGROUND_WIDTH {
+                    r.push(Block::new(0, None));
+                }
+                self.grid.remove(i);
+                self.grid.insert(0, r);
+            }
+        }
     }
 
     pub fn handle_falling(&mut self) {
@@ -141,7 +156,7 @@ impl Tetromino {
                         y: rowidx as i32 + y + 1,
                         x: colidx as i32 + x,
                     };
-                    if next_step.y as usize >= PLAYGROUND_HEIGHT as usize {
+                    if next_step.y >= PLAYGROUND_HEIGHT {
                         return Err("Out of bounds.");
                     }
                     if self.grid[next_step.y as usize][next_step.x as usize].value != 0 {
