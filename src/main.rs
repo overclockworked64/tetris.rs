@@ -60,7 +60,7 @@ fn main() {
                     game.tetromino.rotate(core::Direction::Left);
                 }
             }
-            KEY_D => {
+            KEY_D | nc::KEY_UP => {
                 if !game.paused {
                     game.tetromino.rotate(core::Direction::Right);
                 }
