@@ -212,7 +212,7 @@ impl Tetromino {
                     if rowidx as i32 + y >= PLAYGROUND_HEIGHT {
                         return Err("Out of bounds.");
                     }
-                    if self.grid[rowidx + y as usize][colidx + x as usize].value != 0 {
+                    if self.grid[(rowidx as i32 + y) as usize][(colidx as i32 + x) as usize].value != 0 {
                         return Err("Collision.")
                     }
                 }
