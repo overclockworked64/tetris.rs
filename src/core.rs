@@ -81,12 +81,12 @@ impl Game {
         let current_rotation = self.tetromino.current_rotation;
         let tetrovec = self.tetromino.shape.to_vec(current_rotation);
 
-        for (rowidx, row) in tetrovec.iter().enumerate() {
-            for (colidx, _) in row.iter().enumerate() {
-                if tetrovec[rowidx][colidx] != 0 {
+        for (rowidx, row) in tetrovec.into_iter().enumerate() {
+            for (colidx, column) in row.into_iter().enumerate() {
+                if column != 0 {
                     let Coord { y, x } = self.tetromino.topleft;
                     self.grid[rowidx + y as usize][(colidx as i32 + x as i32) as usize] = Block {
-                        value: tetrovec[rowidx][colidx] as u8,
+                        value: column as u8,
                         color: Some(self.tetromino.color),
                     }
                 }
@@ -141,9 +141,9 @@ impl Tetromino {
 
     pub fn move_sideways(&mut self, direction: Direction) -> Result<(), &'static str> {
         let tetrovec = self.shape.to_vec(self.current_rotation);
-        for (rowidx, row) in tetrovec.iter().enumerate() {
-            for (colidx, _) in row.iter().enumerate() {
-                if tetrovec[rowidx][colidx] != 0 {
+        for (rowidx, row) in tetrovec.into_iter().enumerate() {
+            for (colidx, column) in row.into_iter().enumerate() {
+                if column != 0 {
                     let Coord { y, x } = self.topleft;
                     let next_step = colidx as i32 + x + direction as i32;
                     if !(0..PLAYGROUND_WIDTH).contains(&next_step) {
@@ -168,9 +168,9 @@ impl Tetromino {
 
     pub fn move_down(&mut self) -> Result<(), &'static str> {
         let tetrovec = self.shape.to_vec(self.current_rotation);
-        for (rowidx, row) in tetrovec.iter().enumerate() {
-            for (colidx, _) in row.iter().enumerate() {
-                if tetrovec[rowidx][colidx] != 0 {
+        for (rowidx, row) in tetrovec.into_iter().enumerate() {
+            for (colidx, column) in row.into_iter().enumerate() {
+                if column != 0 {
                     let Coord { y, x } = self.topleft;
                     let next_step = Coord {
                         y: rowidx as i32 + y + 1,
