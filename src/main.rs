@@ -57,12 +57,16 @@ fn main() {
             }
             KEY_A => {
                 if !game.paused {
-                    game.tetromino.rotate(core::Direction::Left);
+                    if let Err(_) = game.tetromino.rotate(core::Direction::Left) {
+                        continue;
+                    }
                 }
             }
             KEY_D | nc::KEY_UP => {
                 if !game.paused {
-                    game.tetromino.rotate(core::Direction::Right);
+                    if let Err(_) = game.tetromino.rotate(core::Direction::Right) {
+                        continue;
+                    }
                 }
             }
             KEY_S => {

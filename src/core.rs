@@ -190,7 +190,7 @@ impl Tetromino {
         Ok(())
     }
 
-    pub fn rotate(&mut self, direction: Direction) {
+    pub fn rotate(&mut self, direction: Direction) -> Result<(), &'static str> {
         let rotations = self.shape.get_possible_rotations();
         let current_index = rotations
             .iter()
@@ -200,7 +200,26 @@ impl Tetromino {
             current_index as i32 + direction as i32,
             rotations.len() as i32,
         );
-        self.current_rotation = rotations[next_index.unwrap() as usize];
+        let potential_rotation = rotations[next_index.unwrap() as usize];
+        let tetrovec = self.shape.to_vec(potential_rotation);
+        for (rowidx, row) in tetrovec.into_iter().enumerate() {
+            for (colidx, column) in row.into_iter().enumerate() {
+                if column != 0 {
+                    let Coord { y, x } = self.topleft;
+                    if !(0..PLAYGROUND_WIDTH).contains(&(colidx as i32 + x)) {
+                        return Err("Out of bounds.");
+                    }
+                    if rowidx as i32 + y >= PLAYGROUND_HEIGHT {
+                        return Err("Out of bounds.");
+                    }
+                    if self.grid[rowidx + y as usize][colidx + x as usize].value != 0 {
+                        return Err("Collision.")
+                    }
+                }
+            }
+        }
+        self.current_rotation = potential_rotation;
+        Ok(())
     }
 }
 
