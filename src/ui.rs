@@ -62,9 +62,9 @@ pub fn refresh_screens(inner_screen: nc::WINDOW) {
 
 pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
     let tetrovec = tetromino.shape.to_vec(tetromino.current_rotation);
-    for (rowidx, row) in tetrovec.iter().enumerate() {
-        for (colidx, _) in row.iter().enumerate() {
-            if tetrovec[rowidx][colidx] != 0 {
+    for (rowidx, row) in tetrovec.into_iter().enumerate() {
+        for (colidx, column) in row.into_iter().enumerate() {
+            if column != 0 {
                 let Coord { y, x } = tetromino.topleft;
                 nc::wattr_on(screen, nc::COLOR_PAIR(tetromino.color as i16));
                 nc::mvwaddstr(
@@ -82,7 +82,7 @@ pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
 pub fn draw_landed_tetrominos(screen: nc::WINDOW, grid: &Grid) {
     for (rowidx, row) in grid.iter().enumerate() {
         for (colidx, _) in row.iter().enumerate() {
-            let block = &grid[rowidx][colidx];
+            let block = grid[rowidx][colidx];
             if block.value != 0 {
                 nc::wattr_on(screen, nc::COLOR_PAIR(block.color.unwrap() as i16));
                 nc::mvwaddstr(screen, rowidx as i32, colidx as i32 * 2, "██");
