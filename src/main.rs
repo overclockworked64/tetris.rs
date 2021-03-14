@@ -1,3 +1,4 @@
+use crate::core::{Direction, Game};
 use ncurses as nc;
 
 mod core;
@@ -17,7 +18,7 @@ fn main() {
     nc::wtimeout(inner_screen, 100);
     nc::keypad(inner_screen, true);
 
-    let mut game = core::Game::new();
+    let mut game = Game::new();
 
     loop {
         ui::erase_screens(inner_screen, border_screen);
@@ -38,12 +39,12 @@ fn main() {
             game.clear_rows();
             match user_input {
                 nc::KEY_LEFT => {
-                    if game.tetromino.move_sideways(core::Direction::Left).is_err() {
+                    if game.tetromino.move_sideways(Direction::Left).is_err() {
                         continue;
                     }
                 }
                 nc::KEY_RIGHT => {
-                    if game.tetromino.move_sideways(core::Direction::Right).is_err() {
+                    if game.tetromino.move_sideways(Direction::Right).is_err() {
                         continue;
                     }
                 }
@@ -53,12 +54,12 @@ fn main() {
                     }
                 }
                 KEY_A => {
-                    if game.tetromino.rotate(core::Direction::Left).is_err() {
+                    if game.tetromino.rotate(Direction::Left).is_err() {
                         continue;
                     }
                 }
                 KEY_D | nc::KEY_UP => {
-                    if game.tetromino.rotate(core::Direction::Right).is_err() {
+                    if game.tetromino.rotate(Direction::Right).is_err() {
                         continue;
                     }
                 }

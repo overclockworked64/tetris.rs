@@ -20,7 +20,7 @@ impl Game {
     pub fn new() -> Game {
         let grid = Game::create_grid();
         Game {
-            tetromino: Tetromino::new(grid.clone()),
+            tetromino: Tetromino::new(grid),
             grid,
             score: 0,
             counter: 0,
@@ -42,7 +42,7 @@ impl Game {
                 let row = Game::create_empty_row();
                 self.grid[i] = row;
                 self.grid[..i + 1].rotate_right(1);
-                self.tetromino.grid = self.grid.clone();
+                self.tetromino.grid = self.grid;
                 self.score += PLAYGROUND_WIDTH as u64;
             }
         }
@@ -56,7 +56,7 @@ impl Game {
                     curses_teardown();
                     std::process::exit(0);
                 } else {
-                    self.tetromino = Tetromino::new(self.grid.clone());
+                    self.tetromino = Tetromino::new(self.grid);
                 }
             }
             self.counter = 0;
