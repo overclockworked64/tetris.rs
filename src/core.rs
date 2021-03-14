@@ -29,28 +29,19 @@ impl Game {
     }
 
     fn create_grid() -> Grid {
-        let mut grid = Vec::with_capacity(PLAYGROUND_HEIGHT as usize);
-        for _ in 0..PLAYGROUND_HEIGHT {
-            let row = Game::create_empty_row();
-            grid.push(row);
-        }
-        grid
+        [Game::create_empty_row(); PLAYGROUND_HEIGHT as usize]
     }
 
-    fn create_empty_row() -> Vec<Block> {
-        let mut row = Vec::with_capacity(PLAYGROUND_WIDTH as usize);
-        for _ in 0..PLAYGROUND_WIDTH {
-            row.push(Block::new(0, None));
-        }
-        row
+    fn create_empty_row() -> [Block; PLAYGROUND_WIDTH as usize] {
+        [Block::new(0, None); PLAYGROUND_WIDTH as usize]
     }
 
     pub fn clear_rows(&mut self) {
         for i in 0..self.grid.len() {
             if self.grid[i].iter().fold(0, |acc, x| acc + x.value) as i32 == PLAYGROUND_WIDTH {
                 let row = Game::create_empty_row();
-                self.grid.remove(i);
-                self.grid.insert(0, row);
+                self.grid[i] = row;
+                self.grid[..i + 1].rotate_right(1);
                 self.tetromino.grid = self.grid.clone();
                 self.score += PLAYGROUND_WIDTH as u64;
             }
@@ -95,7 +86,7 @@ impl Game {
     }
 }
 
-pub type Grid = Vec<Vec<Block>>;
+pub type Grid = [[Block; PLAYGROUND_WIDTH as usize]; PLAYGROUND_HEIGHT as usize];
 
 #[derive(Clone, Copy, Debug)]
 pub struct Block {
@@ -284,7 +275,7 @@ impl Distribution<Shape> for Standard {
 }
 
 type Rotation = u16;
-type ShapeVec = Vec<Vec<u16>>;
+type ShapeVec = Vec<Vec<Rotation>>;
 
 #[derive(Clone, Copy)]
 pub enum Direction {
