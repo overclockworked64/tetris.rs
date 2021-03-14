@@ -27,58 +27,47 @@ fn main() {
         ui::draw_score(game.score);
         ui::refresh_screens(inner_screen);
 
-        if !game.paused {
-            game.handle_falling();
-            game.clear_rows();    
+        let user_input = nc::wgetch(inner_screen);
+
+        if user_input == KEY_P {
+            game.paused = !game.paused;
         }
 
-        let user_input = nc::wgetch(inner_screen);
-        match user_input {
-            nc::KEY_LEFT => {
-                if !game.paused {
-                    if let Err(_) = game.tetromino.move_sideways(core::Direction::Left) {
-                        continue;
-                    }    
-                }
-            }
-            nc::KEY_RIGHT => {
-                if !game.paused {
-                    if let Err(_) = game.tetromino.move_sideways(core::Direction::Right) {
-                        continue;
-                    }    
-                }
-            }
-            nc::KEY_DOWN => {
-                if !game.paused {
-                    if let Err(_) = game.tetromino.move_down() {
-                        continue;
-                    }    
-                }
-            }
-            KEY_A => {
-                if !game.paused {
-                    if let Err(_) = game.tetromino.rotate(core::Direction::Left) {
+        if !game.paused {
+            game.handle_falling();
+            game.clear_rows();
+            match user_input {
+                nc::KEY_LEFT => {
+                    if game.tetromino.move_sideways(core::Direction::Left).is_err() {
                         continue;
                     }
                 }
-            }
-            KEY_D | nc::KEY_UP => {
-                if !game.paused {
-                    if let Err(_) = game.tetromino.rotate(core::Direction::Right) {
+                nc::KEY_RIGHT => {
+                    if game.tetromino.move_sideways(core::Direction::Right).is_err() {
                         continue;
                     }
                 }
-            }
-            KEY_S => {
-                if !game.paused {
+                nc::KEY_DOWN => {
+                    if game.tetromino.move_down().is_err() {
+                        continue;
+                    }
+                }
+                KEY_A => {
+                    if game.tetromino.rotate(core::Direction::Left).is_err() {
+                        continue;
+                    }
+                }
+                KEY_D | nc::KEY_UP => {
+                    if game.tetromino.rotate(core::Direction::Right).is_err() {
+                        continue;
+                    }
+                }
+                KEY_S => {
                     game.tetromino.move_all_the_way_down();
                 }
+                ESC => break,
+                _ => {}
             }
-            KEY_P => {
-                game.paused = !game.paused;
-            }
-            ESC => break,
-            _ => {}
         }
     }
     ui::curses_teardown();

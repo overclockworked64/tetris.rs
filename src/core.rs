@@ -1,4 +1,4 @@
-use crate::ui::{Color, curses_teardown};
+use crate::ui::{curses_teardown, Color};
 use rand::{
     distributions::{Distribution, Standard},
     prelude::SliceRandom,
@@ -29,7 +29,7 @@ impl Game {
     }
 
     fn create_grid() -> Grid {
-        let mut grid = vec![];
+        let mut grid = Vec::with_capacity(PLAYGROUND_HEIGHT as usize);
         for _ in 0..PLAYGROUND_HEIGHT {
             let row = Game::create_empty_row();
             grid.push(row);
@@ -38,7 +38,7 @@ impl Game {
     }
 
     fn create_empty_row() -> Vec<Block> {
-        let mut row = vec![];
+        let mut row = Vec::with_capacity(PLAYGROUND_WIDTH as usize);
         for _ in 0..PLAYGROUND_WIDTH {
             row.push(Block::new(0, None));
         }
@@ -47,7 +47,7 @@ impl Game {
 
     pub fn clear_rows(&mut self) {
         for i in 0..self.grid.len() {
-            if self.grid[i].iter().fold(0, |acc, block| acc + block.value) as i32 == PLAYGROUND_WIDTH {
+            if self.grid[i].iter().fold(0, |acc, x| acc + x.value) as i32 == PLAYGROUND_WIDTH {
                 let row = Game::create_empty_row();
                 self.grid.remove(i);
                 self.grid.insert(0, row);
@@ -60,8 +60,8 @@ impl Game {
     pub fn handle_falling(&mut self) {
         self.counter += 1;
         if self.counter == 5 {
-            if let Err(_) = self.tetromino.move_down() {
-                if let Err(_) = self.land_tetromino() {
+            if self.tetromino.move_down().is_err() {
+                if self.land_tetromino().is_err() {
                     curses_teardown();
                     std::process::exit(0);
                 } else {
@@ -71,7 +71,6 @@ impl Game {
             self.counter = 0;
         }
     }
-
 
     fn land_tetromino(&mut self) -> Result<(), &'static str> {
         if self.tetromino.topleft.y <= 0 {
@@ -115,7 +114,7 @@ pub struct Tetromino {
     pub shape: Shape,
     pub color: Color,
     pub topleft: Coord,
-    pub current_rotation: u16,
+    pub current_rotation: Rotation,
 }
 
 impl Tetromino {
@@ -212,8 +211,10 @@ impl Tetromino {
                     if rowidx as i32 + y >= PLAYGROUND_HEIGHT {
                         return Err("Out of bounds.");
                     }
-                    if self.grid[(rowidx as i32 + y) as usize][(colidx as i32 + x) as usize].value != 0 {
-                        return Err("Collision.")
+                    let surroundings_y = (rowidx as i32 + y) as usize;
+                    let surroundings_x = (colidx as i32 + x) as usize;
+                    if self.grid[surroundings_y][surroundings_x].value != 0 {
+                        return Err("Collision.");
                     }
                 }
             }
@@ -246,7 +247,7 @@ impl Shape {
         }
     }
 
-    fn get_possible_rotations(&self) -> Vec<u16> {
+    fn get_possible_rotations(&self) -> Vec<Rotation> {
         match self {
             Shape::O => vec![51],
             Shape::I => vec![8738, 240],
@@ -258,10 +259,10 @@ impl Shape {
         }
     }
 
-    pub fn to_vec(&self, rotation: u16) -> ShapeVec {
+    pub fn to_vec(&self, rotation: Rotation) -> ShapeVec {
         (0..16)
-            .map(|i| (rotation >> 15 - i) & 1)
-            .collect::<Vec<u16>>()
+            .map(|i| (rotation >> (15 - i)) & 1)
+            .collect::<Vec<Rotation>>()
             .chunks(4)
             .map(|x| x.to_owned())
             .collect::<ShapeVec>()
@@ -282,6 +283,7 @@ impl Distribution<Shape> for Standard {
     }
 }
 
+type Rotation = u16;
 type ShapeVec = Vec<Vec<u16>>;
 
 #[derive(Clone, Copy)]
