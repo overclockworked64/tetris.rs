@@ -81,8 +81,7 @@ pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
 
 pub fn draw_landed_tetrominos(screen: nc::WINDOW, grid: &Grid) {
     for (rowidx, row) in grid.iter().enumerate() {
-        for (colidx, _) in row.iter().enumerate() {
-            let block = grid[rowidx][colidx];
+        for (colidx, block) in row.iter().enumerate() {
             if block.value != 0 {
                 nc::wattr_on(screen, nc::COLOR_PAIR(block.color.unwrap() as i16));
                 nc::mvwaddstr(screen, rowidx as i32, colidx as i32 * 2, "██");

@@ -23,9 +23,11 @@ fn main() {
     loop {
         ui::erase_screens(inner_screen, border_screen);
         nc::box_(border_screen, 0, 0);
+
         ui::draw_landed_tetrominos(inner_screen, &game.grid);
         ui::draw_tetromino(inner_screen, &game.tetromino);
         ui::draw_score(game.score);
+
         ui::refresh_screens(inner_screen);
 
         let user_input = nc::wgetch(inner_screen);
