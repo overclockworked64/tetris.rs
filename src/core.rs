@@ -5,6 +5,9 @@ use rand::{
     Rng,
 };
 
+#[cfg(test)]
+use rstest_reuse::{self, apply, template};
+
 pub const PLAYGROUND_WIDTH: i32 = 10;
 pub const PLAYGROUND_HEIGHT: i32 = 16;
 
@@ -88,7 +91,7 @@ impl Game {
 
 pub type Grid = [[Block; PLAYGROUND_WIDTH as usize]; PLAYGROUND_HEIGHT as usize];
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Block {
     pub value: u8,
     pub color: Option<Color>,
@@ -291,10 +294,42 @@ pub struct Coord {
 }
 
 #[cfg(test)]
+mod game_tests {
+    use super::*;
+    
+    #[test]
+    fn create_grid() {
+        let grid = Game::create_grid();
+        assert_eq!(grid.len(), PLAYGROUND_HEIGHT as usize);
+        for i in 0..PLAYGROUND_HEIGHT {
+            assert_eq!(grid[i as usize].len(), PLAYGROUND_WIDTH as usize);
+        }
+    }
+
+    #[test]
+    fn create_empty_row() {
+        let row = Game::create_empty_row();
+        assert_eq!(row.len(), PLAYGROUND_WIDTH as usize);
+        for i in 0..PLAYGROUND_WIDTH {
+            assert_eq!(row[i as usize], Block { value: 0, color: None});
+        }
+    }
+}
+
+#[cfg(test)]
 mod tetromino_tests {
     use super::*;
-    use rstest::rstest;
+    use rstest::*;
 
+    #[fixture]
+    fn tetromino() -> Tetromino {
+        let grid = Game::create_grid();
+        let mut tetromino = Tetromino::new(grid);
+        tetromino.topleft = Coord { y: 5, x: 5 };
+        tetromino
+    }
+
+    #[template]
     #[rstest(
         shape,
         case(Shape::O),
@@ -305,83 +340,146 @@ mod tetromino_tests {
         case(Shape::L),
         case(Shape::T),
     )]
-    fn rotate_ok(shape: Shape) {
-        let grid = Game::create_grid();
-        let mut tetromino = Tetromino::new(grid);
+    fn all_shapes(shape: Shape) {}
+
+
+    #[apply(all_shapes)]
+    fn move_sideways_left_ok(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        assert_eq!(tetromino.move_sideways(Direction::Left), Ok(()));
+    }
+
+    #[apply(all_shapes)]
+    fn move_sideways_right_ok(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        assert_eq!(tetromino.move_sideways(Direction::Right), Ok(()));
+    }
+
+    #[apply(all_shapes)]
+    fn move_sideways_left_out_of_bounds(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        tetromino.topleft.x = -3;
+        assert_eq!(tetromino.move_sideways(Direction::Left), Err("Out of bounds."));
+    }
+
+    #[apply(all_shapes)]
+    fn move_sideways_right_out_of_bounds(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        tetromino.topleft.x = PLAYGROUND_WIDTH;
+        assert_eq!(tetromino.move_sideways(Direction::Right), Err("Out of bounds."));
+    }
+
+    // #[apply(all_shapes)]
+    // fn move_sideways_left_collision() {}
+
+    // #[apply(all_shapes)]
+    // fn move_sideways_right_collision() {}
+
+    #[apply(all_shapes)]
+    fn move_down_no_obstacles(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        tetromino.topleft.y = 0;
+        for _ in 0..5 {
+            assert_eq!(tetromino.move_down(), Ok(()));
+        }
+    }
+
+    #[apply(all_shapes)]
+    fn move_down_out_of_bounds(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        tetromino.topleft.y = PLAYGROUND_HEIGHT;
+        assert_eq!(tetromino.move_down(), Err("Out of bounds."));
+    }
+
+    #[apply(all_shapes)]
+    fn move_down_collision(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        for i in 6..9 {
+            tetromino.grid[i] = [Block::new(1, None); PLAYGROUND_WIDTH as usize];
+        }
+        assert_eq!(tetromino.move_down(), Err("Collision."));
+    }
+
+    #[apply(all_shapes)]
+    fn rotate_left_ok(mut tetromino: Tetromino, shape: Shape) {
         tetromino.shape = shape;
         let possible_rotations = tetromino.shape.get_possible_rotations();
-        tetromino.current_rotation = possible_rotations[0];
-        tetromino.topleft = Coord { y: 5, x: 5 };
-        for rotation_number in 1..possible_rotations.len() {
-            assert_eq!(tetromino.rotate(Direction::Right), Ok(()));
-            assert_eq!(tetromino.current_rotation, possible_rotations[rotation_number])
-        }
+        tetromino.current_rotation = *possible_rotations.last().unwrap();
         for rotation_number in (0..possible_rotations.len() - 1).rev() {
             assert_eq!(tetromino.rotate(Direction::Left), Ok(()));
             assert_eq!(tetromino.current_rotation, possible_rotations[rotation_number])
         }
-     }
- 
-     #[rstest(
-        shape,
-        case(Shape::O),
-        case(Shape::I),
-        case(Shape::S),
-        case(Shape::Z),
-        case(Shape::J),
-        case(Shape::L),
-        case(Shape::T),
-    )]
-    fn rotate_out_of_bounds(shape: Shape) {
-        let grid = Game::create_grid();
-        let mut tetromino = Tetromino::new(grid);
+    }
+
+    #[apply(all_shapes)]
+    fn rotate_right_ok(mut tetromino: Tetromino, shape: Shape) {
         tetromino.shape = shape;
         let possible_rotations = tetromino.shape.get_possible_rotations();
         tetromino.current_rotation = possible_rotations[0];
-        tetromino.topleft = Coord { y: 5, x: -3 };
-        for _ in &possible_rotations {
+
+        for rotation_index in 1..possible_rotations.len() {
+            assert_eq!(tetromino.rotate(Direction::Right), Ok(()));
+            assert_eq!(tetromino.current_rotation, possible_rotations[rotation_index])
+        }
+     }
+
+     #[apply(all_shapes)]
+     fn rotate_left_out_of_bounds(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        tetromino.topleft.x = -3;
+        let possible_rotations = tetromino.shape.get_possible_rotations();
+
+        for rotation in possible_rotations {
+            tetromino.current_rotation = rotation;
             assert_eq!(tetromino.rotate(Direction::Left), Err("Out of bounds."));
             assert_eq!(tetromino.current_rotation, tetromino.current_rotation);
         }
-        tetromino.current_rotation = possible_rotations[0];
-        tetromino.topleft = Coord { y: 5, x: PLAYGROUND_WIDTH };
-        for _ in &possible_rotations {
+     }
+
+     #[apply(all_shapes)]
+     fn rotate_right_out_of_bounds(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        tetromino.topleft.x = PLAYGROUND_WIDTH;
+        let possible_rotations = tetromino.shape.get_possible_rotations();
+
+        for rotation in possible_rotations {
+            tetromino.current_rotation = rotation;
             assert_eq!(tetromino.rotate(Direction::Right), Err("Out of bounds."));
             assert_eq!(tetromino.current_rotation, tetromino.current_rotation);
         }
      }
 
-     #[rstest(
-        shape,
-        case(Shape::O),
-        case(Shape::I),
-        case(Shape::S),
-        case(Shape::Z),
-        case(Shape::J),
-        case(Shape::L),
-        case(Shape::T),
-    )]
-    fn rotate_collision(shape: Shape) {
-        let mut grid = Game::create_grid();
-        for i in 6..9 {
-            grid[i] = [Block::new(1, None); PLAYGROUND_WIDTH as usize];
-        }
-        let mut tetromino = Tetromino::new(grid);
+     #[apply(all_shapes)]
+     fn rotate_collision_left(mut tetromino: Tetromino, shape: Shape) {
         tetromino.shape = shape;
         let possible_rotations = tetromino.shape.get_possible_rotations();
-        tetromino.current_rotation = possible_rotations[0];
-        tetromino.topleft = Coord { y: 5, x: 5 };
-        for _ in &possible_rotations {
+
+        for i in 6..9 {
+            tetromino.grid[i] = [Block::new(1, None); PLAYGROUND_WIDTH as usize];
+        }
+
+        for rotation in possible_rotations {
+            tetromino.current_rotation = rotation;
             assert_eq!(tetromino.rotate(Direction::Left), Err("Collision."));
             assert_eq!(tetromino.current_rotation, tetromino.current_rotation);
         }
-        tetromino.current_rotation = possible_rotations[0];
-        tetromino.topleft = Coord { y: 5, x: 5 };
-        for _ in &possible_rotations {
+     }
+
+     #[apply(all_shapes)]
+     fn rotate_collision_right(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+        let possible_rotations = tetromino.shape.get_possible_rotations();
+
+        for i in 6..9 {
+            tetromino.grid[i] = [Block::new(1, None); PLAYGROUND_WIDTH as usize];
+        }
+
+        for rotation in possible_rotations {
+            tetromino.current_rotation = rotation;
             assert_eq!(tetromino.rotate(Direction::Right), Err("Collision."));
             assert_eq!(tetromino.current_rotation, tetromino.current_rotation);
         }
-     }
+    }
 }
 
 #[cfg(test)]
