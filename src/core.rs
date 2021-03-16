@@ -392,12 +392,8 @@ mod tetromino_tests {
             }
         }
 
-        assert_eq!(
-            tetromino.move_sideways(Direction::Right),
-            Err("Collision.")
-        );
+        assert_eq!(tetromino.move_sideways(Direction::Right), Err("Collision."));
     }
-
 
     #[apply(all_shapes)]
     fn move_sideways_right_collision(mut tetromino: Tetromino, shape: Shape) {
@@ -411,10 +407,7 @@ mod tetromino_tests {
             }
         }
 
-        assert_eq!(
-            tetromino.move_sideways(Direction::Left),
-            Err("Collision.")
-        );
+        assert_eq!(tetromino.move_sideways(Direction::Left), Err("Collision."));
     }
 
     #[apply(all_shapes)]
