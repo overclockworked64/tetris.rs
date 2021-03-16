@@ -1,4 +1,5 @@
-use crate::core::{Coord, Grid, Tetromino, PLAYGROUND_HEIGHT, PLAYGROUND_WIDTH};
+use crate::core::{Coord, Grid, PLAYGROUND_HEIGHT, PLAYGROUND_WIDTH};
+use crate::tetromino::Tetromino;
 use ncurses as nc;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;

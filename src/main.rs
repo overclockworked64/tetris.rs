@@ -5,6 +5,8 @@ use crate::core::{Direction, Game};
 use ncurses as nc;
 
 mod core;
+mod shape;
+mod tetromino;
 mod ui;
 
 const KEY_A: i32 = b'a' as i32;
