@@ -133,4 +133,27 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn clear_rows() {
+        let mut game = Game::new();
+        for row in 0..PLAYGROUND_HEIGHT {
+            for column in 0..PLAYGROUND_WIDTH {
+                if row > ((PLAYGROUND_HEIGHT / 4) * 3) - 1 {
+                    game.grid[row as usize][column as usize] = Block::new(1, None);
+                }
+            }
+        }
+
+        let row_above_last_quarter = (((PLAYGROUND_HEIGHT / 4) * 3) - 1) as usize;
+        for column in 4..7 {
+            game.grid[row_above_last_quarter][column] = Block::new(1, None);
+        }
+
+        game.clear_rows();
+
+        for column in 4..7 {
+            assert_eq!(game.grid[PLAYGROUND_HEIGHT as usize - 1][column], Block::new(1, None));
+        }        
+    }
 }
