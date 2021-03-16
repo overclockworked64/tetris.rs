@@ -290,18 +290,19 @@ pub struct Coord {
 
 #[cfg(test)]
 mod shape_tests {
-    use rstest::rstest;
     use super::*;
+    use rstest::rstest;
 
     #[rstest(
-        shape, color,
+        shape,
+        color,
         case(Shape::O, Color::Blue),
         case(Shape::I, Color::Yellow),
         case(Shape::S, Color::Cyan),
         case(Shape::Z, Color::White),
         case(Shape::J, Color::Magenta),
         case(Shape::L, Color::Red),
-        case(Shape::T, Color::Green),
+        case(Shape::T, Color::Green)
     )]
     fn get_color(shape: Shape, color: Color) {
         assert_eq!(shape.get_color(), color);
@@ -328,7 +329,7 @@ mod shape_tests {
                 vec![0, 0, 0, 0],
                 vec![0, 0, 0, 0],
                 vec![0, 0, 1, 1],
-                vec![0, 0, 1, 1],    
+                vec![0, 0, 1, 1],
             ]
         ]),
         case(Shape::I, vec![
@@ -350,13 +351,13 @@ mod shape_tests {
                 vec![0, 0, 0, 0],
                 vec![0, 0, 0, 0],
                 vec![0, 0, 1, 1],
-                vec![0, 1, 1, 0],                
+                vec![0, 1, 1, 0],
             ],
             vec![
                 vec![0, 0, 0, 0],
                 vec![0, 0, 1, 0],
                 vec![0, 0, 1, 1],
-                vec![0, 0, 0, 1],                
+                vec![0, 0, 0, 1],
             ],
         ]),
         case(Shape::Z, vec![
@@ -364,13 +365,13 @@ mod shape_tests {
                 vec![0, 0, 0, 0],
                 vec![0, 0, 0, 0],
                 vec![0, 1, 1, 0],
-                vec![0, 0, 1, 1],                
+                vec![0, 0, 1, 1],
             ],
             vec![
                 vec![0, 0, 0, 0],
                 vec![0, 0, 0, 1],
                 vec![0, 0, 1, 1],
-                vec![0, 0, 1, 0],                
+                vec![0, 0, 1, 0],
             ],
         ]),
         case(Shape::J, vec![
