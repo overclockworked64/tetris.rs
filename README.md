@@ -1,5 +1,9 @@
 # tetris.rs
 
+![build status](https://github.com/xvm32/tetris.rs/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/xvm32/tetris.rs/branch/master/graph/badge.svg?token=rpZcLzfCIT)](https://codecov.io/gh/xvm32/tetris.rs)
+
+
+
 This is the classic tetris game I wrote to have a bit of fun with Rust.
 
 ## Installation and playing
