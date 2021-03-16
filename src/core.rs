@@ -215,6 +215,7 @@ impl Tetromino {
     }
 }
 
+#[derive(PartialEq)]
 pub enum Shape {
     O,
     I,
@@ -285,4 +286,176 @@ pub enum Direction {
 pub struct Coord {
     pub y: i32,
     pub x: i32,
+}
+
+#[cfg(test)]
+mod shape_tests {
+    use rstest::rstest;
+    use super::*;
+
+    #[rstest(
+        shape, color,
+        case(Shape::O, Color::Blue),
+        case(Shape::I, Color::Yellow),
+        case(Shape::S, Color::Cyan),
+        case(Shape::Z, Color::White),
+        case(Shape::J, Color::Magenta),
+        case(Shape::L, Color::Red),
+        case(Shape::T, Color::Green),
+    )]
+    fn get_color(shape: Shape, color: Color) {
+        assert_eq!(shape.get_color(), color);
+    }
+
+    #[rstest(
+        shape, rotations,
+        case(Shape::O, vec![51]),
+        case(Shape::I, vec![8738, 240]),
+        case(Shape::S, vec![54, 561]),
+        case(Shape::Z, vec![99, 306]),
+        case(Shape::J, vec![275, 71, 802, 113]),
+        case(Shape::L, vec![547, 116, 785, 23]),
+        case(Shape::T, vec![114, 305, 39, 562]),
+    )]
+    fn get_possible_rotations(shape: Shape, rotations: Vec<Rotation>) {
+        assert_eq!(shape.get_possible_rotations(), rotations);
+    }
+
+    #[rstest(
+        shape, expected,
+        case(Shape::O, vec![
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 1],
+                vec![0, 0, 1, 1],    
+            ]
+        ]),
+        case(Shape::I, vec![
+            vec![
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 0],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![1, 1, 1, 1],
+                vec![0, 0, 0, 0],
+            ],
+        ]),
+        case(Shape::S, vec![
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 1],
+                vec![0, 1, 1, 0],                
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 1],
+                vec![0, 0, 0, 1],                
+            ],
+        ]),
+        case(Shape::Z, vec![
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 1, 1, 0],
+                vec![0, 0, 1, 1],                
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 1],
+                vec![0, 0, 1, 1],
+                vec![0, 0, 1, 0],                
+            ],
+        ]),
+        case(Shape::J, vec![
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 1],
+                vec![0, 0, 0, 1],
+                vec![0, 0, 1, 1],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 1, 0, 0],
+                vec![0, 1, 1, 1],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 1],
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 0],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 1, 1, 1],
+                vec![0, 0, 0, 1],
+            ],
+        ]),
+        case(Shape::L, vec![
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 1],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 1, 1, 1],
+                vec![0, 1, 0, 0],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 1],
+                vec![0, 0, 0, 1],
+                vec![0, 0, 0, 1],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 1],
+                vec![0, 1, 1, 1],
+            ],
+        ]),
+        case(Shape::T, vec![
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 1, 1, 1],
+                vec![0, 0, 1, 0],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 1],
+                vec![0, 0, 1, 1],
+                vec![0, 0, 0, 1],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 0],
+                vec![0, 1, 1, 1],
+            ],
+            vec![
+                vec![0, 0, 0, 0],
+                vec![0, 0, 1, 0],
+                vec![0, 0, 1, 1],
+                vec![0, 0, 1, 0],
+            ],
+        ]),
+    )]
+    fn to_vec(shape: Shape, expected: Vec<ShapeVec>) {
+        let possible_rotations = shape.get_possible_rotations();
+        for (exp, possible_rotation) in expected.iter().zip(possible_rotations) {
+            assert_eq!(shape.to_vec(possible_rotation), *exp);
+        }
+    }
 }
