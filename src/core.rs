@@ -153,7 +153,10 @@ mod tests {
         game.clear_rows();
 
         for column in 4..7 {
-            assert_eq!(game.grid[PLAYGROUND_HEIGHT as usize - 1][column], Block::new(1, None));
-        }        
+            assert_eq!(
+                game.grid[PLAYGROUND_HEIGHT as usize - 1][column],
+                Block::new(1, None)
+            );
+        }
     }
 }
