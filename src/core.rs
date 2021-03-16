@@ -6,7 +6,7 @@ use rand::{
 };
 
 #[cfg(test)]
-use rstest_reuse::{self, apply, template};
+use rstest_reuse::{self, *};
 
 pub const PLAYGROUND_WIDTH: i32 = 10;
 pub const PLAYGROUND_HEIGHT: i32 = 16;
@@ -380,11 +380,42 @@ mod tetromino_tests {
         );
     }
 
-    // #[apply(all_shapes)]
-    // fn move_sideways_left_collision() {}
+    #[apply(all_shapes)]
+    fn move_sideways_left_collision(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
 
-    // #[apply(all_shapes)]
-    // fn move_sideways_right_collision() {}
+        for row in 0..PLAYGROUND_HEIGHT {
+            for column in 0..PLAYGROUND_WIDTH {
+                if column > PLAYGROUND_WIDTH - 5 {
+                    tetromino.grid[row as usize][column as usize] = Block::new(1, None);
+                }
+            }
+        }
+
+        assert_eq!(
+            tetromino.move_sideways(Direction::Right),
+            Err("Collision.")
+        );
+    }
+
+
+    #[apply(all_shapes)]
+    fn move_sideways_right_collision(mut tetromino: Tetromino, shape: Shape) {
+        tetromino.shape = shape;
+
+        for row in 0..PLAYGROUND_HEIGHT {
+            for column in 0..PLAYGROUND_WIDTH {
+                if column <= 6 {
+                    tetromino.grid[row as usize][column as usize] = Block::new(1, None);
+                }
+            }
+        }
+
+        assert_eq!(
+            tetromino.move_sideways(Direction::Left),
+            Err("Collision.")
+        );
+    }
 
     #[apply(all_shapes)]
     fn move_down_no_obstacles(mut tetromino: Tetromino, shape: Shape) {
