@@ -65,7 +65,7 @@ impl Game {
         }
 
         let current_rotation = self.tetromino.current_rotation;
-        let tetrovec = self.tetromino.shape.to_vec(current_rotation);
+        let tetrovec = self.tetromino.shape.to_4x4(current_rotation);
 
         for (rowidx, row) in tetrovec.into_iter().enumerate() {
             for (colidx, column) in row.into_iter().enumerate() {

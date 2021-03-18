@@ -41,7 +41,7 @@ impl Shape {
         }
     }
 
-    pub fn to_vec(&self, rotation: Rotation) -> ShapeVec {
+    pub fn to_4x4(&self, rotation: Rotation) -> ShapeVec {
         (0..16)
             .map(|i| (rotation >> (15 - i)) & 1)
             .collect::<Vec<Rotation>>()
@@ -233,10 +233,10 @@ mod tests {
             ],
         ]),
     )]
-    fn to_vec(shape: Shape, expected: Vec<ShapeVec>) {
+    fn to_4x4(shape: Shape, expected: Vec<ShapeVec>) {
         let possible_rotations = shape.get_possible_rotations();
         for (exp, possible_rotation) in expected.iter().zip(possible_rotations) {
-            assert_eq!(shape.to_vec(possible_rotation), *exp);
+            assert_eq!(shape.to_4x4(possible_rotation), *exp);
         }
     }
 }

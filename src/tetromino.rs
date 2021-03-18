@@ -36,7 +36,7 @@ impl Tetromino {
     }
 
     pub fn move_sideways(&mut self, direction: Direction) -> Result<(), &'static str> {
-        let tetrovec = self.shape.to_vec(self.current_rotation);
+        let tetrovec = self.shape.to_4x4(self.current_rotation);
         for (rowidx, row) in tetrovec.into_iter().enumerate() {
             for (colidx, column) in row.into_iter().enumerate() {
                 if column != 0 {
@@ -63,7 +63,7 @@ impl Tetromino {
     }
 
     pub fn move_down(&mut self) -> Result<(), &'static str> {
-        let tetrovec = self.shape.to_vec(self.current_rotation);
+        let tetrovec = self.shape.to_4x4(self.current_rotation);
         for (rowidx, row) in tetrovec.into_iter().enumerate() {
             for (colidx, column) in row.into_iter().enumerate() {
                 if column != 0 {
@@ -97,7 +97,7 @@ impl Tetromino {
             rotations.len() as i32,
         );
         let potential_rotation = rotations[next_index.unwrap() as usize];
-        let tetrovec = self.shape.to_vec(potential_rotation);
+        let tetrovec = self.shape.to_4x4(potential_rotation);
         for (rowidx, row) in tetrovec.into_iter().enumerate() {
             for (colidx, column) in row.into_iter().enumerate() {
                 if column != 0 {
