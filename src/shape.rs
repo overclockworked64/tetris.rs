@@ -5,7 +5,7 @@ use rand::{
     Rng,
 };
 
-#[derive(PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum Shape {
     O,
     I,

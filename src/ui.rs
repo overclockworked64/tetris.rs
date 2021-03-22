@@ -61,7 +61,7 @@ pub fn refresh_screens(inner_screen: nc::WINDOW) {
     nc::wrefresh(inner_screen);
 }
 
-pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
+pub fn draw_current_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
     let tetrovec = tetromino.shape.to_4x4(tetromino.current_rotation);
     for (rowidx, row) in tetrovec.into_iter().enumerate() {
         for (colidx, column) in row.into_iter().enumerate() {
@@ -78,6 +78,30 @@ pub fn draw_tetromino(screen: nc::WINDOW, tetromino: &Tetromino) {
             }
         }
     }
+}
+
+pub fn draw_next_tetromino(tetromino: &Tetromino) {
+    let y = (nc::LINES() - SCREEN_HEIGHT) / 2;
+    let x = (nc::COLS() - SCREEN_WIDTH) / 2;
+
+    nc::mvaddstr(y, x + SCREEN_WIDTH + 6, "NEXT");
+
+    let tetrovec = tetromino.shape.to_4x4(tetromino.current_rotation);
+
+    for (rowidx, row) in tetrovec.into_iter().enumerate() {
+        for (colidx, column) in row.into_iter().enumerate() {
+            if column != 0 {
+                nc::attron(nc::COLOR_PAIR(tetromino.color as i16));
+                nc::mvaddstr(
+                    rowidx as i32 + y as i32 + 2,
+                    (colidx as i32 * 2) + x + SCREEN_WIDTH + 2,
+                    "██",
+                );
+                nc::attroff(nc::COLOR_PAIR(tetromino.color as i16));
+            }
+        }
+    }
+
 }
 
 pub fn draw_landed_tetrominos(screen: nc::WINDOW, grid: &Grid) {

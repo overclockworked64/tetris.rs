@@ -30,7 +30,8 @@ fn main() {
         nc::box_(border_screen, 0, 0);
 
         ui::draw_landed_tetrominos(inner_screen, &game.grid);
-        ui::draw_tetromino(inner_screen, &game.tetromino);
+        ui::draw_current_tetromino(inner_screen, &game.current_tetromino);
+        ui::draw_next_tetromino(&game.next_tetromino);
         ui::draw_score(game.score);
 
         ui::refresh_screens(inner_screen);
@@ -46,32 +47,32 @@ fn main() {
             game.clear_rows();
             match user_input {
                 nc::KEY_LEFT => {
-                    if game.tetromino.move_sideways(Direction::Left).is_err() {
+                    if game.current_tetromino.move_sideways(Direction::Left).is_err() {
                         continue;
                     }
                 }
                 nc::KEY_RIGHT => {
-                    if game.tetromino.move_sideways(Direction::Right).is_err() {
+                    if game.current_tetromino.move_sideways(Direction::Right).is_err() {
                         continue;
                     }
                 }
                 nc::KEY_DOWN => {
-                    if game.tetromino.move_down().is_err() {
+                    if game.current_tetromino.move_down().is_err() {
                         continue;
                     }
                 }
                 KEY_A => {
-                    if game.tetromino.rotate(Direction::Left).is_err() {
+                    if game.current_tetromino.rotate(Direction::Left).is_err() {
                         continue;
                     }
                 }
                 KEY_D | nc::KEY_UP => {
-                    if game.tetromino.rotate(Direction::Right).is_err() {
+                    if game.current_tetromino.rotate(Direction::Right).is_err() {
                         continue;
                     }
                 }
                 KEY_S => {
-                    game.tetromino.move_all_the_way_down();
+                    game.current_tetromino.move_all_the_way_down();
                 }
                 ESC => break,
                 _ => {}

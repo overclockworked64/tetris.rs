@@ -6,6 +6,7 @@ use rand::prelude::SliceRandom;
 #[cfg(test)]
 use rstest_reuse::{self, *};
 
+#[derive(Clone)]
 pub struct Tetromino {
     pub grid: Grid,
     pub shape: Shape,
