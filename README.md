@@ -6,7 +6,7 @@ This is the classic tetris game I wrote to have a bit of fun with Rust.
 
 ## Installation and playing
 
-![screencast](tetris-rs.gif)
+![screencast](tetris.gif)
 
 ```
 cargo install --git https://github.com/xvm32/tetris.rs.git

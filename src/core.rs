@@ -6,7 +6,7 @@ pub const PLAYGROUND_HEIGHT: i32 = 16;
 
 pub struct Game {
     pub grid: Grid,
-    pub current_tetromino: Tetromino,
+    pub tetromino: Tetromino,
     pub next_tetromino: Tetromino,
     pub paused: bool,
     pub score: u64,
@@ -17,7 +17,7 @@ impl Game {
     pub fn new() -> Game {
         let grid = Game::create_grid();
         Game {
-            current_tetromino: Tetromino::new(grid),
+            tetromino: Tetromino::new(grid),
             next_tetromino: Tetromino::new(grid),
             grid,
             score: 0,
@@ -40,7 +40,7 @@ impl Game {
                 let row = Game::create_empty_row();
                 self.grid[i] = row;
                 self.grid[..i + 1].rotate_right(1);
-                self.current_tetromino.grid = self.grid;
+                self.tetromino.grid = self.grid;
                 self.score += PLAYGROUND_WIDTH as u64;
             }
         }
@@ -49,13 +49,13 @@ impl Game {
     pub fn handle_falling(&mut self) {
         self.counter += 1;
         if self.counter == 5 {
-            if self.current_tetromino.move_down().is_err() {
+            if self.tetromino.move_down().is_err() {
                 if self.land_tetromino().is_err() {
                     curses_teardown();
                     std::process::exit(0);
                 } else {
-                    self.current_tetromino = self.next_tetromino.clone();
-                    self.current_tetromino.grid = self.grid;
+                    self.tetromino = self.next_tetromino.clone();
+                    self.tetromino.grid = self.grid;
                     self.next_tetromino = Tetromino::new(self.grid);
                 }
             }
@@ -64,20 +64,20 @@ impl Game {
     }
 
     fn land_tetromino(&mut self) -> Result<(), &'static str> {
-        if self.current_tetromino.topleft.y <= 0 {
+        if self.tetromino.topleft.y <= 0 {
             return Err("Game over.");
         }
 
-        let current_rotation = self.current_tetromino.current_rotation;
-        let tetrovec = self.current_tetromino.shape.to_4x4(current_rotation);
+        let current_rotation = self.tetromino.current_rotation;
+        let tetrovec = self.tetromino.shape.to_4x4(current_rotation);
 
         for (rowidx, row) in tetrovec.into_iter().enumerate() {
             for (colidx, column) in row.into_iter().enumerate() {
                 if column != 0 {
-                    let Coord { y, x } = self.current_tetromino.topleft;
+                    let Coord { y, x } = self.tetromino.topleft;
                     self.grid[rowidx + y as usize][(colidx as i32 + x as i32) as usize] = Block {
                         value: column as u8,
-                        color: Some(self.current_tetromino.color),
+                        color: Some(self.tetromino.color),
                     }
                 }
             }
