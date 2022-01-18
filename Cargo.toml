@@ -1,7 +1,7 @@
 [package]
 name = "tetris-rs"
 version = "0.1.0"
-authors = ["xvm32 <xvm32@users.noreply.github.com>"]
+authors = ["overclockworked64 <overclockworked64@users.noreply.github.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

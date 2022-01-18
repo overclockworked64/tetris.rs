@@ -1,6 +1,6 @@
 # tetris.rs
 
-![build status](https://github.com/xvm32/tetris.rs/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/xvm32/tetris.rs/branch/master/graph/badge.svg?token=rpZcLzfCIT)](https://codecov.io/gh/xvm32/tetris.rs)
+![build status](https://github.com/overclockworked64/tetris.rs/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/overclockworked64/tetris.rs/branch/master/graph/badge.svg?token=rpZcLzfCIT)](https://codecov.io/gh/overclockworked64/tetris.rs)
 
 This is the classic tetris game I wrote to have a bit of fun with Rust.
 
@@ -9,7 +9,7 @@ This is the classic tetris game I wrote to have a bit of fun with Rust.
 ![screencast](tetris.gif)
 
 ```
-cargo install --git https://github.com/xvm32/tetris.rs.git
+cargo install --git https://github.com/overclockworked64/tetris.rs.git
 ```
 
 Then run:
@@ -30,5 +30,5 @@ Fork the repository and make a PR.
 
 ## Licensing
 
-Licensed under the [MIT License](https://opensource.org/licenses/MIT). For details, see [LICENSE](https://github.com/xvm32/tetris.rs/blob/master/LICENSE).
+Licensed under the [MIT License](https://opensource.org/licenses/MIT). For details, see [LICENSE](https://github.com/overclockworked64/tetris.rs/blob/master/LICENSE).
 
